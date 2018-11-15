@@ -1,11 +1,10 @@
 # network-embedding-evaluation
 
 Tentative Folder Structure:
-- embeddings/pytorch/ - holds all PyTorch exports (HEER, DistMult, ComplEx, ConvE)
-- embeddings/tensorflow/ - holds all TensorFlow exports (ProjE)
+- embeddings/<embedding method>/ - holds all relevant exports for a given embedding method (HEER, DistMult, ComplEx, ConvE, etc.)
 
-- datasets/FB15K237/
+- datasets/FB15K237/ 
 
-- models/ - contains class definitions for each embedding method, these classes will just load existing embeddings and node/edge IDs and execute prediction functions for testing
+- models/ - contains class definitions for each embedding method, these classes will just load existing embeddings from embeddings/ and node/edge IDs from datasets/ and execute prediction functions for testing
 
 - evaluate.py - top-level evaluation script that performs all tests on all models and reports metrics
