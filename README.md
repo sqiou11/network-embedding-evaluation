@@ -1,7 +1,7 @@
 # network-embedding-evaluation
 
 Tentative Folder Structure:
-- embeddings/<embedding method>/ - holds all relevant exports for a given embedding method (HEER, DistMult, ComplEx, ConvE, etc.)
+- embeddings/\<embedding_method\>/ - holds all relevant exports for a given embedding method (HEER, DistMult, ComplEx, ConvE, etc.)
 
 - datasets/FB15K237/ 
 
