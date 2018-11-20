@@ -6,18 +6,6 @@ from torch.nn import Parameter
 import numpy as np
 
 import cPickle
-import ast
-
-def read_config(conf_name):
-    config = {}
-    with open(conf_name) as IN:
-        config['edges'] = ast.literal_eval(IN.readline())
-        config['nodes'] = ast.literal_eval(IN.readline())
-        config['types'] = ast.literal_eval(IN.readline())
-        for i,x in enumerate(ast.literal_eval(IN.readline())):
-            config['edges'][i].append(int(x))        
-    assert len(config['edges']) == len(config['types'])
-    return config
 
 """
 def load_emb(root_dir, emb_path, emb_size, graph_name, node_types):

@@ -30,25 +30,30 @@ per_type_cur_model_dir="$root_dir"/datasets/FB15K237/per_type_temp/ #TODO: take 
 mkdir -p "$per_type_cur_model_dir"
 
 echo ${yellow}===$model Testing===${reset}
-echo "Splitting test cases by edge type..."
-python2 "$root_dir"/util/separate_edges_by_types.py --input-file=$eval_file --output-dir="$per_type_cur_model_dir"
+#echo "Splitting test cases by edge type..."
+#python2 "$root_dir"/util/separate_edges_by_types.py --input-file=$eval_file --output-dir="$per_type_cur_model_dir"
+#echo "Done."
+
+tf_models=("ProjE")
+pt_models=("HEER DistMult ComplEx")
+echo "Computing predictions for all test cases..."
+if [[ "${pt_models[@]}" =~ "${model}" ]]; then
+	python2 "$root_dir"/pred_head_tail.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
+else
+	python3 "$root_dir"/pred_head_tail_tf.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
+fi
 echo "Done."
 
-#TODO: pass in model name
-echo "Computing predictions for all test cases by edge type..."
-python2 "$root_dir"/pred.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
-echo "Done."
+#score_file="$root_dir"/results/"$model"_scores.txt
+#output_file="$root_dir"/results/"$model"_metrics.txt
 
-score_file="$root_dir"/results/"$model"_scores.txt
-output_file="$root_dir"/results/"$model"_metrics.txt
+#echo "Merging edge type prediction scores..."
+#python2 "$root_dir"/util/merge_edges_with_all_types.py --input-ref-file $eval_file --input-score-dir "$per_type_cur_model_dir" --input-score-keywords _pred --output-file "$score_file"
+#echo "Done."
 
-echo "Merging edge type prediction scores..."
-python2 "$root_dir"/util/merge_edges_with_all_types.py --input-ref-file $eval_file --input-score-dir "$per_type_cur_model_dir" --input-score-keywords _pred --output-file "$score_file"
-echo "Done."
-
-echo "Computing MRR from scores..."
-python3 "$root_dir"/util/mrr_from_score.py --input-score-file $score_file --input-eval-file $eval_file > "$output_file"
-echo "Done."
+#echo "Computing MRR from scores..."
+#python3 "$root_dir"/util/mrr_from_score.py --input-score-file $score_file --input-eval-file $eval_file > "$output_file"
+#echo "Done."
 
 echo "Cleaning up..."
 rm -r "$per_type_cur_model_dir"
