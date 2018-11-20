@@ -11,6 +11,8 @@ reset=`tput sgr0`
 
 # input variables
 model=${1:-HEER} # which model to run: HEER, DistMult, ComplEx, ProjE, ConvE, node2vec
+entity_pred=${2:-true}
+relation_pred=${3:-true}
 gpu=${2:-0} # working gpu for prediction
 
 # find relative root directory
@@ -34,18 +36,29 @@ echo ${yellow}===$model Testing===${reset}
 #python2 "$root_dir"/util/separate_edges_by_types.py --input-file=$eval_file --output-dir="$per_type_cur_model_dir"
 #echo "Done."
 
+output_file="$root_dir"/results/"$model"_metrics.txt
+
 tf_models=("ProjE")
 pt_models=("HEER DistMult ComplEx")
-echo "Computing predictions for all test cases..."
+echo "Computing entity predictions for all test cases..."
 if [[ "${pt_models[@]}" =~ "${model}" ]]; then
-	python2 "$root_dir"/pred_head_tail.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
+  if [[ "${entity_pred}" =~ "true" ]]; then
+	  python2 "$root_dir"/pred_head_tail.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
+  fi
+  if [[ "${relation_pred}" =~ "true" ]]; then
+    python2 "$root_dir"/pred_relation.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
+  fi
 else
-	python3 "$root_dir"/pred_head_tail_tf.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
+  if [[ "${entity_pred}" =~ "true" ]]; then
+	  python3 "$root_dir"/pred_head_tail_tf.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
+  fi
+  if [[ "${relation_pred}" =~ "true" ]]; then
+    python3 "$root_dir"/pred_relation_tf.py --model=$model --batch-size=128 --gpu=$gpu --test-dir="$per_type_cur_model_dir"
+  fi
 fi
 echo "Done."
 
 #score_file="$root_dir"/results/"$model"_scores.txt
-#output_file="$root_dir"/results/"$model"_metrics.txt
 
 #echo "Merging edge type prediction scores..."
 #python2 "$root_dir"/util/merge_edges_with_all_types.py --input-ref-file $eval_file --input-score-dir "$per_type_cur_model_dir" --input-score-keywords _pred --output-file "$score_file"

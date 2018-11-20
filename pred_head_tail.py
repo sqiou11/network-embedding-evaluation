@@ -78,6 +78,7 @@ def calculate_metrics(batch, head_type, head_val, tail_type, tail_val, edge_type
 				edge_type in train_edge_dict[head_type][head_val][str(pred_id)]):
 				true_pos_cnt += 1
 				avg_precision += true_pos_cnt/(true_pos_cnt + false_pos_cnt)
+				#print(str(pred_id) + ' is a correct prediction')
 			else:
 				false_pos_cnt += 1
 				num_grtr_f += (num_grtr == -1)

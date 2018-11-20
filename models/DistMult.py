@@ -37,8 +37,13 @@ class DistMult(nn.Module):
 		p_score = self._calc(p_e_h,p_e_t,p_e_r)
 		return torch.sort(p_score, descending=True)[1].data.cpu().numpy().tolist()
 
-	def predict_rel(self, head, tail, rs):
-		heads = torch.LongTensor([head] * len(rs)).cuda()
-		tails = torch.LongTensor([tail] * len(rs)).cuda()
-		rs = torch.LongTensor(rs).cuda()
-		return self.predict(heads, tails, rs)
+	def predict_relation(self, head, tail, rs):
+		heads = torch.LongTensor([head] * self._n_relations).cuda()
+		tails = torch.LongTensor([tail] * self._n_relations).cuda()
+		rs = torch.LongTensor(range(self._n_relations)).cuda()
+
+		p_e_h = self.ent_embeddings(Variable(heads.cuda()))
+		p_e_t = self.ent_embeddings(Variable(tails.cuda()))
+		p_e_r = self.rel_embeddings(Variable(rs.cuda()))
+		p_score = self._calc(p_e_h,p_e_t,p_e_r)
+		return torch.sort(p_score, descending=True)[1].data.cpu().numpy().tolist()

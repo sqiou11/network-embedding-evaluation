@@ -39,3 +39,17 @@ class ComplEx(nn.Module):
 		p_im_r=self.rel_im_embeddings(Variable(predict_r.cuda()))
 		p_score = self._calc(p_re_h, p_im_h, p_re_t, p_im_t, p_re_r, p_im_r)
 		return torch.sort(p_score, descending=True)[1].data.tolist()
+
+	def predict_relation(self, head, tail, edge):
+		predict_h = torch.LongTensor([head] * self._n_relations)
+		predict_t = torch.LongTensor([tail] * self._n_relations)
+		predict_r = torch.LongTensor(range(self._n_relations))
+
+		p_re_h=self.ent_re_embeddings(Variable(predict_h.cuda()))
+		p_re_t=self.ent_re_embeddings(Variable(predict_t.cuda()))
+		p_re_r=self.rel_re_embeddings(Variable(predict_r.cuda()))
+		p_im_h=self.ent_im_embeddings(Variable(predict_h.cuda()))
+		p_im_t=self.ent_im_embeddings(Variable(predict_t.cuda()))
+		p_im_r=self.rel_im_embeddings(Variable(predict_r.cuda()))
+		p_score = self._calc(p_re_h, p_im_h, p_re_t, p_im_t, p_re_r, p_im_r)
+		return torch.sort(p_score, descending=True)[1].data.tolist()

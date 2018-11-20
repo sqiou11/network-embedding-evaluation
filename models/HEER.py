@@ -36,11 +36,6 @@ class HEER(nn.Module):
         self.out_embed.weight = Parameter(t.FloatTensor(self.num_classes, self.embed_size).uniform_(-0.1, 0.1).cuda())
         self.in_embed.weight = Parameter(t.FloatTensor(self.num_classes, self.embed_size).uniform_(-0.1, 0.1).cuda())
 
-        xxx = t.load(embedding_file, map_location=lambda storage, loc: storage)
-        self.load_state_dict(xxx, False)
-        self.cuda()
-        self.eval()
-
         if self.map_mode > -1: 
             for tp in self.edge_types:
                 self.edge_mapping.append(self.genMappingLayer(self.map_mode))
@@ -54,6 +49,10 @@ class HEER(nn.Module):
 
                 #if self.mode == -2:
                     #self.edge_mapping_bn.append(nn.Dropout().cuda())
+        xxx = t.load(embedding_file, map_location=lambda storage, loc: storage)
+        self.load_state_dict(xxx)
+        self.cuda()
+        self.eval()
         
         self.type_offset.append(type_offset['sum'])
 
@@ -137,9 +136,10 @@ class HEER(nn.Module):
         
         return t.sort(log_target, descending=True)[1].data.cpu().numpy().tolist()
 
-    def predict_rel(self, head, tail, tps):
+    def predict_relation(self, head, tail, tp):
         heads = t.LongTensor([head])
         tails = t.LongTensor([tail])
+        tps = range(len(self.edge_types))
         inputs = heads.cuda()
         outputs = tails.cuda()
 
@@ -157,7 +157,7 @@ class HEER(nn.Module):
             else:
                 log_target = self.edge_map(self.edge_rep(u_input, v_output), tp).sum(1).squeeze().sigmoid()
             score.append(log_target.data.cpu().numpy().tolist())
-        return score
+        return np.argsort(np.array(score)).tolist()[::-1]
 
 
     def input_embeddings(self):
